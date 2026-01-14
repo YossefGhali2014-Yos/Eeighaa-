@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>إيقاع - النسخة المطورة</title>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    <style>
+        /* التعديل هنا: الخلفية سوداء تماماً وتوسيط العناصر */
+        body { 
+            background: #000000; 
+            color: white; 
+            text-align: center; 
+            font-family: sans-serif; 
+            height: 100vh; 
+            display: flex; 
+            flex-direction: column; 
+            justify-content: center; 
+            align-items: center; 
+            margin: 0; 
+            overflow: hidden;
+        }
+
+        /* تصميم الدائرة البنفسجية النابضة */
+        .circle { 
+            width: 220px; 
+            height: 220px; 
+            background: radial-gradient(circle, #a020f0, #000); 
+            border-radius: 50%; 
+            cursor: pointer; 
+            box-shadow: 0 0 30px #a020f0; 
+            animation: pulse 1.5s infinite; /* إضافة حركة النبض */
+            transition: 0.1s; 
+        }
+
+        .circle:active { transform: scale(0.9); box-shadow: 0 0 50px #ffffff; }
+
+        /* كود حركة النبض */
+        @keyframes pulse {
+            0% { transform: scale(1); box-shadow: 0 0 20px #a020f0; }
+            50% { transform: scale(1.1); box-shadow: 0 0 50px #a020f0; }
+            100% { transform: scale(1); box-shadow: 0 0 20px #a020f0; }
+        }
+
+        #status { margin-top: 20px; color: #a020f0; font-weight: bold; }
+        .footer-text { margin-top: 10px; font-size: 12px; color: #444; }
+    </style>
+</head>
+<body>
+    <h1>تطبيق إيقاع</h1>
+    <div class="circle" onclick="sendPulse()"></div>
+    <p id="status">EEIGHAA LIVE ON GALAXY A36</p>
+    <p>إجمالي النبضات العالمية: <span id="globalCount">0</span></p>
+
+    <script>
+        // إعدادات Firebase (اتركها كما هي في ملفك الأصلي)
+        const firebaseConfig = {
+            apiKey: "AIzaSyAR1rdxhN88u7tsc0juOsu...", 
+            authDomain: "eeighaa-ebcd1.firebaseapp.com",
+            databaseURL: "https://eeighaa-ebcd1-default-rtdb.europe-west1.firebasedatabase.app",
+            projectId: "eeighaa-ebcd1",
+            storageBucket: "eeighaa-ebcd1.firebasestorage.app"
+        };
+        
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+
+        function sendPulse() {
+            database.ref('global_pulses').transaction((currentCount) => {
+                return (currentCount || 0) + 1;
+            });
+            document.getElementById('status').innerText = "تم إرسال نبضة للسيرفر! ✅";
+            if (navigator.vibrate) navigator.vibrate(70);
+        }
+
+        database.ref('global_pulses').on('value', (snapshot) => {
+            document.getElementById('globalCount').innerText = snapshot.val() || 0;
+        });
+    </script>
+</body>
+</html>
