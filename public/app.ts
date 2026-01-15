@@ -18,7 +18,7 @@ const countDisplay = document.getElementById('globalCount') as HTMLSpanElement;
 const statusText = document.getElementById('status') as HTMLDivElement;
 
 let energy = 0;
-let moodLock = 0; // ذاكرة المشاعر لضمان عدم اختفاء الرسالة بسرعة
+let lastMood = "جاهز لاستقبال شعورك.."; // تخزين آخر شعور
 
 function animate() {
     if (pulseBtn) {
@@ -28,25 +28,25 @@ function animate() {
         
         pulseBtn.style.transform = `scale(${scale}) translate(${shake}px, ${shake}px)`;
         
-        // منطق تحديد الشعور مع خاصية الثبات
-        if (energy > 250 || moodLock > 50) {
+        // تحديث المظهر بناءً على "آخر شعور محقق"
+        if (energy > 250) {
             pulseBtn.style.boxShadow = `0 0 ${glow}px #ff0000`;
             document.body.style.backgroundColor = "#2a0000"; 
-            if (statusText) statusText.innerText = "أنت منفجر طاقة! 💥🔥";
-            if (energy > 250) moodLock = 100; 
-        } else if (energy > 100 || moodLock > 20) {
+            lastMood = "أنت منفجر طاقة! 💥🔥";
+        } else if (energy > 100) {
             pulseBtn.style.boxShadow = `0 0 ${glow}px #ff00ff`;
             document.body.style.backgroundColor = "#1a0b2e";
-            if (statusText) statusText.innerText = "يا له من حماس! ✨🚀";
-        } else {
+            lastMood = "يا له من حماس! ✨🚀";
+        } else if (energy > 10) {
             pulseBtn.style.boxShadow = `0 0 ${glow}px #9d50bb`;
             document.body.style.backgroundColor = "#0d1117";
-            if (statusText) statusText.innerText = energy > 10 ? "نبض هادئ.. ✨" : "جاهز لاستقبال شعورك..";
+            lastMood = "نبض هادئ.. ✨";
         }
 
-        // استنزاف الطاقة والذاكرة (جعلنا الذاكرة تنخفض أبطأ)
-        if (energy > 0) energy -= 2.2; 
-        if (moodLock > 0) moodLock -= 0.6; 
+        if (statusText) statusText.innerText = lastMood;
+
+        // تنخفض الطاقة ليعود الحجم طبيعياً، لكن "lastMood" يظل ثابتاً
+        if (energy > 0) energy -= 2.0; 
     }
     requestAnimationFrame(animate);
 }
@@ -55,9 +55,8 @@ animate();
 
 function handleAction(e: Event) {
     e.preventDefault();
-    energy = Math.min(energy + 15, 500); 
-    moodLock = Math.min(moodLock + 12, 100); 
-
+    // شحن الطاقة بناءً على الضغط
+    energy = Math.min(energy + 18, 500); 
     db.ref('global_pulses').transaction((c: number | null) => (c || 0) + 1);
 }
 
