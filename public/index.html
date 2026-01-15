@@ -1,9 +1,41 @@
 <!DOCTYPE html>
-<html>
+<html dir="rtl" lang="ar">
 <head>
-    <title>موقع إيقاع</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>إيقاع - شارك نبضك</title>
+    <style>
+        body {
+            background-color: #0d1117;
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            font-family: sans-serif;
+            text-align: center;
+        }
+        .welcome-container {
+            padding: 20px;
+        }
+        .heart {
+            color: #ff3e3e;
+            font-size: 50px;
+            animation: beat 1.2s infinite;
+        }
+        @keyframes beat {
+            0% { transform: scale(1); }
+            30% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+    </style>
 </head>
 <body>
-    <h1>تم تشغيل موقع إيقاع بنجاح! 😈</h1>
+    <div class="welcome-container">
+        <div class="heart">❤️</div>
+        <h1>مرحباً بك في إيقاع</h1>
+        <p>هنا.. نبضك يتردد صداه حول العالم.</p>
+    </div>
 </body>
 </html>
