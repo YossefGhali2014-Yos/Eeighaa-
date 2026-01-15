@@ -5,35 +5,90 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>إيقاع - شارك نبضك</title>
     <style>
-        body { background-color: #0d1117; color: white; display: flex; flex-direction: column; justify-content: center; align-items: center; height: 100vh; margin: 0; font-family: sans-serif; overflow: hidden; }
-        .heart-btn { font-size: 80px; cursor: pointer; user-select: none; transition: transform 0.1s; animation: soft-beat 1.5s infinite; }
-        .heart-btn:active { transform: scale(0.8); animation: none; }
-        @keyframes soft-beat { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); } }
-        .pulse-circle { position: absolute; border: 2px solid #ff3e3e; border-radius: 50%; pointer-events: none; animation: pulse-out 0.6s linear; }
-        @keyframes pulse-out { from { width: 80px; height: 80px; opacity: 1; } to { width: 300px; height: 300px; opacity: 0; } }
-        h1 { margin-top: 20px; font-weight: 300; }
+        body { 
+            background-color: #0d1117; 
+            color: white; 
+            display: flex; 
+            flex-direction: column; 
+            justify-content: center; 
+            align-items: center; 
+            height: 100vh; 
+            margin: 0; 
+            font-family: sans-serif; 
+            overflow: hidden; 
+        }
+        /* الدائرة البنفسجية المركزية */
+        .purple-circle { 
+            width: 120px;
+            height: 120px;
+            background-color: #8a2be2; /* لون بنفسجي جذاب */
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 0 20px rgba(138, 43, 226, 0.5);
+            transition: transform 0.1s;
+            animation: breathe 2s infinite ease-in-out;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            z-index: 10;
+        }
+        .purple-circle:active { transform: scale(0.9); }
+        
+        /* أنيميشن التنفس للدائرة */
+        @keyframes breathe {
+            0%, 100% { transform: scale(1); box-shadow: 0 0 20px rgba(138, 43, 226, 0.5); }
+            50% { transform: scale(1.05); box-shadow: 0 0 40px rgba(138, 43, 226, 0.8); }
+        }
+
+        /* تأثير موجة النبض عند الضغط */
+        .wave {
+            position: absolute;
+            border: 2px solid #8a2be2;
+            border-radius: 50%;
+            pointer-events: none;
+            animation: wave-out 0.8s ease-out forwards;
+        }
+        @keyframes wave-out {
+            from { width: 120px; height: 120px; opacity: 1; }
+            to { width: 500px; height: 500px; opacity: 0; }
+        }
+
+        h1 { margin-top: 30px; font-weight: 300; letter-spacing: 1px; }
     </style>
 </head>
 <body>
 
-    <div class="heart-btn" id="heart">❤️</div>
-    <h1 id="status">اضغط لتشارك نبضك</h1>
+    <div class="purple-circle" id="pulse-btn"></div>
+    <h1 id="status">المس الدائرة لتشارك نبضك</h1>
 
     <script>
-        const heart = document.getElementById('heart');
+        const btn = document.getElementById('pulse-btn');
         const status = document.getElementById('status');
 
-        heart.addEventListener('click', (e) => {
-            // إنشاء تأثير النبضة البصرية
-            const pulse = document.createElement('div');
-            pulse.classList.add('pulse-circle');
-            pulse.style.left = (e.clientX - 40) + 'px';
-            pulse.style.top = (e.clientY - 40) + 'px';
-            document.body.appendChild(pulse);
+        btn.addEventListener('click', (e) => {
+            // إنشاء موجة بنفسجية
+            const wave = document.createElement('div');
+            wave.classList.add('wave');
+            // ضبط مكان الموجة في المنتصف تماماً
+            wave.style.left = '50%';
+            wave.style.top = '50%';
+            wave.style.transform = 'translate(-50%, -50%)';
+            document.body.appendChild(wave);
             
-            // تغيير الحالة مؤقتاً
-            status.innerText = "تم إرسال نبضتك!";
-            setTimeout(() => { status.innerText = "اضغط لتشارك نبضك"; pulse.remove(); }, 600);
+            status.innerText = "نبضتك تسافر الآن..";
+            
+            // اهتزاز وتأثير بسيط
+            if (navigator.vibrate) navigator.vibrate(60);
+
+            setTimeout(() => {
+                status.innerText = "المس الدائرة لتشارك نبضك";
+                wave.remove();
+            }, 800);
+        });
+    </script>
+</body>
+</html>
 
             // اهتزاز بسيط للهاتف (إذا كان يدعم ذلك)
             if (navigator.vibrate) navigator.vibrate(50);
