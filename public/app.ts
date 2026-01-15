@@ -1,4 +1,4 @@
-// تعريف هيكل البيانات لـ Firebase لضمان عدم وجود أخطاء إملائية
+// إعدادات Firebase
 interface FirebaseConfig {
     apiKey: string;
     authDomain: string;
@@ -13,27 +13,30 @@ const config: FirebaseConfig = {
     projectId: "eeighaa-ebcd1"
 };
 
-// إخبار TypeScript أن كائن firebase معرف عالمياً
+// تعريف Firebase
 declare var firebase: any;
 firebase.initializeApp(config);
-const database = firebase.database();
 
-// تحديد أنواع العناصر لضمان وجودها في الصفحة
+// استخدام 'db' ليتوافق مع الخطأ في الصورة
+const db = firebase.database();
+
+// تعريف العناصر بالأسماء التي اشتكى المترجم من فقدانها
 const pulseBtn = document.getElementById('pulseBtn') as HTMLDivElement;
-const globalDisplay = document.getElementById('globalCount') as HTMLSpanElement;
+const countDisplay = document.getElementById('globalCount') as HTMLSpanElement;
+const statusText = document.getElementById('status') as HTMLParagraphElement;
 
 const sendPulse = (): void => {
-    // استخدام الـ Transaction لضمان دقة العداد العالمي
-    database.ref('global_pulses').transaction((count: number | null) => (count || 0) + 1);
+    db.ref('global_pulses').transaction((c: number | null) => (c || 0) + 1);
+    if (statusText) statusText.innerText = "تم إرسال نبضة ذكية! ✅";
     if (navigator.vibrate) navigator.vibrate(70);
 };
 
-if (pulseBtn) {
-    pulseBtn.addEventListener('click', sendPulse);
-}
+if (pulseBtn) pulseBtn.addEventListener('click', sendPulse);
 
-// الاستماع للنبضات وتحديث الواجهة فوراً
-database.ref('global_pulses').on('value', (snapshot: any) => {
+db.ref('global_pulses').on('value', (snap: any) => {
+    if (countDisplay) countDisplay.innerText = snap.val() || 0;
+    if (statusText) statusText.innerText = "متصل بالسحابة (TS) ☁️";
+});
     if (globalDisplay) {
         globalDisplay.innerText = snapshot.val() || 0;
     }
