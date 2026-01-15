@@ -1,4 +1,3 @@
-// 1. الإعدادات
 interface FirebaseConfig {
     apiKey: string;
     authDomain: string;
@@ -13,35 +12,47 @@ const config: FirebaseConfig = {
     projectId: "eeighaa-ebcd1"
 };
 
-// 2. التهيئة
 declare var firebase: any;
-if (!firebase.apps.length) {
-    firebase.initializeApp(config);
-}
+if (!firebase.apps.length) { firebase.initializeApp(config); }
 const db = firebase.database();
 
-// 3. العناصر
 const pulseBtn = document.getElementById('pulseBtn') as HTMLDivElement;
 const countDisplay = document.getElementById('globalCount') as HTMLSpanElement;
 const statusText = document.getElementById('status') as HTMLParagraphElement;
 
-// 4. الوظيفة
+// متغيرات لقياس السرعة (الشعور)
+let lastClickTime = 0;
+let energy = 0;
+
 function sendPulse(): void {
-    db.ref('global_pulses').transaction((current: number | null) => (current || 0) + 1);
+    const now = Date.now();
+    const diff = now - lastClickTime;
+    lastClickTime = now;
+
+    // إذا كان الفرق أقل من 300 مللي ثانية، الشخص متحمس!
+    if (diff < 300) {
+        energy = Math.min(energy + 20, 100); // زيادة الطاقة
+    } else {
+        energy = Math.max(energy - 10, 0); // هدوء
+    }
+
+    // تحديث شكل الدائرة بناءً على "الطاقة"
+    if (pulseBtn) {
+        pulseBtn.style.boxShadow = `0 0 ${20 + energy}px #9d50bb`;
+        pulseBtn.style.filter = `brightness(${1 + energy/100})`;
+    }
+
+    db.ref('global_pulses').transaction((c: number | null) => (c || 0) + 1);
+    
     if (statusText) {
-        statusText.innerText = "تم إرسال نبضة ذكية! ✅";
-        setTimeout(() => { statusText.innerText = "متصل بالسحابة (TS) ☁️"; }, 1000);
+        statusText.innerText = energy > 50 ? "إيقاع حماسي! 🔥" : "إيقاع هادئ.. ✨";
     }
-    if (navigator.vibrate) navigator.vibrate(70);
+
+    if (navigator.vibrate) navigator.vibrate(energy > 50 ? 100 : 50);
 }
 
-// 5. التنفيذ
-if (pulseBtn) {
-    pulseBtn.addEventListener('click', sendPulse);
-}
+if (pulseBtn) { pulseBtn.addEventListener('click', sendPulse); }
 
-db.ref('global_pulses').on('value', (snapshot: any) => {
-    if (countDisplay) {
-        countDisplay.innerText = snapshot.val() || 0;
-    }
+db.ref('global_pulses').on('value', (snap: any) => {
+    if (countDisplay) countDisplay.innerText = snap.val() || 0;
 });
