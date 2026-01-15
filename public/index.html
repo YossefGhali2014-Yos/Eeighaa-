@@ -3,35 +3,35 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>إيقاع - الإصدار الشعوري</title>
+    <title>إيقاع - النبض الكامل</title>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
-<style>
-    body { 
-        background: #0d1117; color: white; text-align: center; 
-        font-family: sans-serif; height: 100vh; margin: 0;
-        display: flex; flex-direction: column; 
-        justify-content: center; align-items: center;
-        overflow: hidden; touch-action: none;
-    }
-    .circle { 
-        width: 180px; height: 180px; 
-        background: radial-gradient(circle, #9d50bb, #6e48aa); 
-        border-radius: 50%; cursor: pointer;
-        user-select: none;
-        /* ملاحظة: حذفنا الـ transition والـ animation القديم هنا */
-    }
-    #globalCount { font-size: 3rem; color: #9d50bb; font-weight: bold; }
-    #status { height: 30px; margin-bottom: 10px; color: #6e48aa; }
-</style>
+    <style>
+        body { 
+            background: #0d1117; color: white; text-align: center; 
+            font-family: sans-serif; height: 100vh; margin: 0;
+            display: flex; flex-direction: column; 
+            justify-content: center; align-items: center;
+            overflow: hidden; touch-action: none;
+        }
+        #status { height: 40px; color: #9d50bb; font-size: 1.1rem; margin-bottom: 10px; transition: 0.2s; }
+        .circle { 
+            width: 180px; height: 180px; 
+            background: radial-gradient(circle, #9d50bb, #6e48aa); 
+            border-radius: 50%; cursor: pointer;
+            user-select: none; outline: none; -webkit-tap-highlight-color: transparent;
+        }
+        .count-box { margin-top: 30px; display: flex; flex-direction: column; align-items: center; }
+        .count-label { font-size: 1.2rem; color: #888; margin-bottom: 5px; }
+        #globalCount { font-size: 3.5rem; color: #9d50bb; font-weight: bold; line-height: 1; }
+    </style>
 </head>
 <body>
     <div id="status">جاهز للنبض..</div>
     <div class="circle" id="pulseBtn"></div>
     <div class="count-box">
-        النبضات العالمية:
+        <span class="count-label">النبضات العالمية:</span>
         <span id="globalCount">0</span>
     </div>
-    <script src="app.js"></script>
-</body>
+    <script src="app.js?v=2.0"></script> </body>
 </html>
