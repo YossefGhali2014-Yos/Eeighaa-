@@ -15,43 +15,39 @@ const db = firebase.database();
 
 const pulseBtn = document.getElementById('pulseBtn') as HTMLDivElement;
 const countDisplay = document.getElementById('globalCount') as HTMLSpanElement;
-const statusText = document.getElementById('status') as HTMLParagraphElement;
 
-let energy = 0;
+let visualEnergy = 0;
 
-function updateVisuals() {
+// محرك الرسم: يعمل بتردد 60 إطار في الثانية مهما كانت سرعة الضغط
+function renderLoop() {
     if (pulseBtn) {
-        // إذا كانت الطاقة عالية، نتحول للون الأحمر المتوهج فوراً
-        const intensity = Math.min(energy, 255);
-        const color = energy > 100 ? `rgb(255, ${255 - intensity}, ${intensity})` : '#9d50bb';
+        // حساب التوهج: من البنفسجي إلى الأبيض المتوهج عند 1ms
+        const hue = Math.max(280 - visualEnergy, 0); // يتحول للون أفتح
+        const brightness = 100 + Math.min(visualEnergy, 150);
         
-        pulseBtn.style.boxShadow = `0 0 ${20 + energy}px ${color}`;
-        pulseBtn.style.transform = `scale(${1 + (energy / 400)})`;
-        pulseBtn.style.filter = `brightness(${1 + energy/100})`;
+        pulseBtn.style.boxShadow = `0 0 ${10 + visualEnergy/2}px hsla(${hue}, 70%, 60%, 0.8)`;
+        pulseBtn.style.transform = `scale(${1 + Math.min(visualEnergy/500, 0.4)})`;
+        pulseBtn.style.filter = `brightness(${brightness}%)`;
     }
-    
-    // تقليل الطاقة تدريجياً لخلق تأثير النبض
-    energy = Math.max(energy - 2, 0);
-    requestAnimationFrame(updateVisuals);
+
+    // تقليل الطاقة تدريجياً لضمان "هبوط" ناعم بعد توقف الـ Auto Clicker
+    visualEnergy = Math.max(visualEnergy - 1.5, 0);
+    requestAnimationFrame(renderLoop);
 }
 
-// بدء حلقة التحديث البصري
-updateVisuals();
+renderLoop();
 
 function sendPulse(): void {
-    // مع كل ضغطة، نقفز بالطاقة فوراً
-    energy = Math.min(energy + 30, 300); 
+    // زيادة الطاقة: مع 1ms، ستصل الطاقة لقمة مستواها في أجزاء من الثانية
+    visualEnergy = Math.min(visualEnergy + 5, 400); 
 
+    // تحديث قاعدة البيانات
     db.ref('global_pulses').transaction((c: number | null) => (c || 0) + 1);
-    
-    if (statusText) {
-        statusText.innerText = energy > 150 ? "انفجار شعوري! 💥" : "نبض حي.. ✨";
-    }
-    
-    if (navigator.vibrate) navigator.vibrate(energy > 100 ? 50 : 20);
 }
 
-if (pulseBtn) { pulseBtn.addEventListener('click', sendPulse); }
+if (pulseBtn) {
+    pulseBtn.addEventListener('click', sendPulse);
+}
 
 db.ref('global_pulses').on('value', (snap: any) => {
     if (countDisplay) countDisplay.innerText = snap.val() || 0;
