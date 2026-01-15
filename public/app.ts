@@ -21,43 +21,41 @@ let energy = 0;
 
 function animate() {
     if (pulseBtn) {
-        // 1. حساب التأثيرات الأساسية (موجودة لديك)
-        const scale = 1 + (energy / 350);
-        const glow = 20 + (energy / 1.2);
+        const scale = 1 + (energy / 300);
+        const glow = 20 + (energy / 1.1);
         const hue = 280 - (energy / 2);
         
-        // 2. إحساس "الزلزال": اهتزاز الشاشة عند الحماس العالي (جديد)
-        const shake = energy > 200 ? (Math.random() * 10 - 5) : 0;
+        // إحساس الزلزال (Screen Shake) 🫨
+        const shake = energy > 180 ? (Math.random() * 14 - 7) : 0;
         
-        // 3. تطبيق التأثيرات مع الاهتزاز
         pulseBtn.style.transform = `scale(${scale}) translate(${shake}px, ${shake}px)`;
-        pulseBtn.style.boxShadow = `0 0 ${glow}px hsla(${hue}, 85%, 65%, 0.9)`;
+        pulseBtn.style.boxShadow = `0 0 ${glow}px hsla(${hue}, 90%, 65%, 0.9)`;
         
-        // 4. إحساس "تغير الزمان": الخلفية تتحول للأرجواني مع السرعة (جديد)
-        document.body.style.backgroundColor = `rgb(${energy/4}, 17, ${23 + energy/8})`;
+        // إحساس تغير الزمان (Background Color) 🌌
+        if (energy > 50) {
+            document.body.style.backgroundColor = `rgb(${energy/3}, 10, ${25 + energy/10})`;
+        } else {
+            document.body.style.backgroundColor = "#0d1117";
+        }
 
-        if (energy > 0) energy -= 2.8;
+        if (energy > 0) energy -= 2.5;
     }
     requestAnimationFrame(animate);
 }
-
 
 animate();
 
 function handleAction(e: Event) {
     e.preventDefault();
-    energy = Math.min(energy + 15, 450); // شحن الطاقة
-
+    energy = Math.min(energy + 18, 500); // زيادة الحساسية للـ 1ms
     db.ref('global_pulses').transaction((c: number | null) => (c || 0) + 1);
     
     if (statusText) {
-        statusText.style.opacity = "1";
-        statusText.innerText = energy > 200 ? "وضع الانفجار الشعوري! 🔥" : "تم إرسال نبضة ذكية! ✅";
+        statusText.innerText = energy > 250 ? "انفجار زلزالي!! 🫨🔥" : "نبضة قوية ✅";
     }
 }
 
 if (pulseBtn) {
-    // أحداث فورية تدعم الـ Auto Clicker واللمس
     pulseBtn.addEventListener('mousedown', handleAction);
     pulseBtn.addEventListener('touchstart', handleAction);
 }
