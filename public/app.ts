@@ -1,4 +1,4 @@
-// إعدادات Firebase
+// 1. إعدادات Firebase لـ "إيقاع"
 interface FirebaseConfig {
     apiKey: string;
     authDomain: string;
@@ -13,27 +13,36 @@ const config: FirebaseConfig = {
     projectId: "eeighaa-ebcd1"
 };
 
-// تعريف Firebase
+// 2. تعريف الكائنات
 declare var firebase: any;
 firebase.initializeApp(config);
-
-// استخدام 'db' ليتوافق مع الخطأ في الصورة
 const db = firebase.database();
 
-// تعريف العناصر بالأسماء التي اشتكى المترجم من فقدانها
+// 3. عناصر الواجهة
 const pulseBtn = document.getElementById('pulseBtn') as HTMLDivElement;
 const countDisplay = document.getElementById('globalCount') as HTMLSpanElement;
 const statusText = document.getElementById('status') as HTMLParagraphElement;
 
-const sendPulse = (): void => {
-    db.ref('global_pulses').transaction((c: number | null) => (c || 0) + 1);
+// 4. وظيفة الإرسال
+function sendPulse(): void {
+    db.ref('global_pulses').transaction((current: number | null) => (current || 0) + 1);
     if (statusText) statusText.innerText = "تم إرسال نبضة ذكية! ✅";
     if (navigator.vibrate) navigator.vibrate(70);
-};
+    setTimeout(() => {
+        if (statusText) statusText.innerText = "متصل بالسحابة (TS) ☁️";
+    }, 1000);
+}
 
-if (pulseBtn) pulseBtn.addEventListener('click', sendPulse);
+// 5. تفعيل المستمعات
+if (pulseBtn) {
+    pulseBtn.onclick = sendPulse;
+}
 
-db.ref('global_pulses').on('value', (snap: any) => {
+db.ref('global_pulses').on('value', (snapshot: any) => {
+    if (countDisplay) {
+        countDisplay.innerText = snapshot.val() || 0;
+    }
+});
     if (countDisplay) countDisplay.innerText = snap.val() || 0;
     if (statusText) statusText.innerText = "متصل بالسحابة (TS) ☁️";
 });
