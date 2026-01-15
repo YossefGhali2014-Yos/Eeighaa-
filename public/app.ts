@@ -1,3 +1,4 @@
+// 1. الإعدادات
 interface FirebaseConfig {
     apiKey: string; authDomain: string; databaseURL: string; projectId: string;
 }
@@ -19,48 +20,42 @@ const statusText = document.getElementById('status') as HTMLDivElement;
 
 let energy = 0;
 
-// محرك الرسم المستقل - يضمن ظهور التوهج مهما كانت سرعة الـ Auto Clicker
-function animate() {
+// 2. محرك الرسم (هنا يكمن الشعور)
+function render() {
     if (pulseBtn) {
-        // تأثير التوهج والحجم بناءً على "طاقة" الضغطات
-        const glow = 15 + (energy / 1.5);
-        const scale = 1 + (energy / 400);
-        const brightness = 100 + (energy / 2);
+        const scale = 1 + (energy / 400); // الدائرة تكبر مع الضغط
+        const glow = 15 + (energy / 1.5); // التوهج يزداد
+        const hue = 280 - (energy / 2);    // اللون يتغير قليلاً
         
-        // تحول اللون للوردي المحمر عند الانفجار
-        const hue = 280 - (energy / 2); 
-        
-        pulseBtn.style.boxShadow = `0 0 ${glow}px hsla(${hue}, 80%, 60%, 0.9)`;
         pulseBtn.style.transform = `scale(${scale})`;
-        pulseBtn.style.filter = `brightness(${brightness}%)`;
+        pulseBtn.style.boxShadow = `0 0 ${glow}px hsla(${hue}, 80%, 60%, 0.9)`;
         
-        // استنزاف الطاقة تدريجياً لخلق تأثير "النبض"
-        if (energy > 0) energy -= 2;
+        // استنزاف الطاقة تدريجياً لخلق حركة النبض
+        if (energy > 0) energy -= 2.5;
     }
-    requestAnimationFrame(animate);
+    requestAnimationFrame(render);
 }
 
-animate();
+render();
 
+// 3. معالج الضغطات (يدعم 1ms واللمس)
 function triggerPulse(e: Event) {
     e.preventDefault();
-    // زيادة الطاقة: مع 1ms ستصل للـ 300 بسرعة وتحدث الانفجار
-    energy = Math.min(energy + 12, 350);
+    energy = Math.min(energy + 12, 350); // شحن الطاقة فوراً
 
     if (statusText) {
-        if (energy > 200) statusText.innerText = "وضع الانفجار! 🔥";
-        else statusText.innerText = "إيقاع نشط ✨";
+        statusText.innerText = energy > 200 ? "وضع الانفجار! 🔥" : "تم إرسال نبضة! ✅";
     }
 
     db.ref('global_pulses').transaction((c: number | null) => (c || 0) + 1);
 }
 
 if (pulseBtn) {
-    // استخدام أحداث سريعة جداً لدعم الـ Auto Clicker واللمس
     pulseBtn.addEventListener('mousedown', triggerPulse);
     pulseBtn.addEventListener('touchstart', triggerPulse);
 }
 
+// 4. تحديث العداد العالمي
 db.ref('global_pulses').on('value', (snap: any) => {
     if (countDisplay) countDisplay.innerText = snap.val() || 0;
 });
