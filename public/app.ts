@@ -43,6 +43,15 @@ db.ref('global_pulses').on('value', (snapshot: any) => {
         countDisplay.innerText = snapshot.val() || 0;
     }
 });
+if (pulseBtn) {
+    pulseBtn.onclick = sendPulse;
+}
+
+db.ref('global_pulses').on('value', (snapshot: any) => {
+    if (countDisplay) {
+        countDisplay.innerText = snapshot.val() || 0;
+    }
+});
     if (countDisplay) countDisplay.innerText = snap.val() || 0;
     if (statusText) statusText.innerText = "متصل بالسحابة (TS) ☁️";
 });
