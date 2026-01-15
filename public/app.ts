@@ -23,19 +23,28 @@ function animate() {
     if (pulseBtn) {
         const scale = 1 + (energy / 300);
         const glow = 20 + (energy / 1.1);
-        const hue = 280 - (energy / 2);
         
-        // إحساس الزلزال (Screen Shake) 🫨
-        const shake = energy > 180 ? (Math.random() * 14 - 7) : 0;
+        // إحساس الاهتزاز (الزلزال) عند الغضب أو السرعة القصوى
+        const shake = energy > 200 ? (Math.random() * 10 - 5) : 0;
         
         pulseBtn.style.transform = `scale(${scale}) translate(${shake}px, ${shake}px)`;
-        pulseBtn.style.boxShadow = `0 0 ${glow}px hsla(${hue}, 90%, 65%, 0.9)`;
         
-        // إحساس تغير الزمان (Background Color) 🌌
-        if (energy > 50) {
-            document.body.style.backgroundColor = `rgb(${energy/3}, 10, ${25 + energy/10})`;
+        // تغيير الألوان بناءً على "الشعور"
+        if (energy > 250) {
+            // شعور: انفجار/غضب 🔥
+            pulseBtn.style.boxShadow = `0 0 ${glow}px #ff0000`;
+            document.body.style.backgroundColor = "#2a0000"; 
+            if (statusText) statusText.innerText = "أنت منفجر طاقة! 💥🔥";
+        } else if (energy > 100) {
+            // شعور: حماس/سعادة ✨
+            pulseBtn.style.boxShadow = `0 0 ${glow}px #ff00ff`;
+            document.body.style.backgroundColor = "#1a0b2e";
+            if (statusText) statusText.innerText = "يا له من حماس! ✨🚀";
         } else {
+            // شعور: هدوء/تركيز 🌊
+            pulseBtn.style.boxShadow = `0 0 ${glow}px #9d50bb`;
             document.body.style.backgroundColor = "#0d1117";
+            if (statusText) statusText.innerText = energy > 10 ? "نبض هادئ.. ✨" : "جاهز لاستقبال شعورك..";
         }
 
         if (energy > 0) energy -= 2.5;
@@ -47,12 +56,8 @@ animate();
 
 function handleAction(e: Event) {
     e.preventDefault();
-    energy = Math.min(energy + 18, 500); // زيادة الحساسية للـ 1ms
+    energy = Math.min(energy + 15, 500); 
     db.ref('global_pulses').transaction((c: number | null) => (c || 0) + 1);
-    
-    if (statusText) {
-        statusText.innerText = energy > 250 ? "انفجار زلزالي!! 🫨🔥" : "نبضة قوية ✅";
-    }
 }
 
 if (pulseBtn) {
