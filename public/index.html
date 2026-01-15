@@ -3,62 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>إيقاع - بث مباشر</title>
+    <title>إيقاع - TypeScript Edition</title>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
     <style>
-        body { background: #0d1117; color: white; text-align: center; font-family: sans-serif; height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; margin: 0; overflow: hidden; }
-        
-        /* الدائرة البنفسجية المطلوبة */
-        .circle { 
-            width: 200px; height: 200px; 
-            background: radial-gradient(circle, #9d50bb, #6e48aa); 
-            border-radius: 50%; cursor: pointer; 
-            box-shadow: 0 0 30px #9d50bb; transition: 0.1s; 
-            animation: breathe 2s infinite ease-in-out; 
-        }
-        .circle:active { transform: scale(0.9); }
-        
-        @keyframes breathe { 
-            0%, 100% { transform: scale(1); opacity: 0.9; } 
-            50% { transform: scale(1.05); opacity: 1; } 
-        }
-
-        #status { margin-top: 20px; color: #00d2ff; font-weight: bold; }
-        .count-box { margin-top: 15px; font-size: 1.2rem; }
-        #globalCount { font-size: 2.5rem; color: #9d50bb; display: block; margin-top: 5px; }
+        body { background: #0d1117; color: white; text-align: center; font-family: sans-serif; height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; margin: 0; }
+        .circle { width: 180px; height: 180px; background: radial-gradient(circle, #9d50bb, #6e48aa); border-radius: 50%; cursor: pointer; box-shadow: 0 0 30px #9d50bb; transition: 0.1s; }
+        #globalCount { font-size: 2.5rem; color: #9d50bb; display: block; }
     </style>
 </head>
 <body>
-    <h1>تطبيق إيقاع</h1>
-    <div class="circle" onclick="sendPulse()"></div>
-    <p id="status">جاهز للإرسال بالسحابة ☁️</p>
-    <div class="count-box">
-        إجمالي النبضات العالمية:
-        <span id="globalCount">0</span>
-    </div>
+    <h1>تطبيق إيقاع (TS)</h1>
+    <div class="circle" id="pulseBtn"></div>
+    <p id="status">جاري الاتصال بالسحابة... ☁️</p>
+    <div>إجمالي النبضات: <span id="globalCount">0</span></div>
 
-    <script>
-        // إعدادات Firebase الخاصة بمشروعك
-        const firebaseConfig = {
-            apiKey: "AIzaSyAR1rdxhN88u7tsc0juOsu...", 
-            authDomain: "eeighaa-ebcd1.firebaseapp.com",
-            databaseURL: "https://eeighaa-ebcd1-default-rtdb.europe-west1.firebasedatabase.app",
-            projectId: "eeighaa-ebcd1",
-            storageBucket: "eeighaa-ebcd1.firebasestorage.app"
-        };
-        
-        firebase.initializeApp(firebaseConfig);
-        const database = firebase.database();
-
-        // إرسال النبضة للسيرفر
-        function sendPulse() {
-            database.ref('global_pulses').transaction((currentCount) => {
-                return (currentCount || 0) + 1;
-            });
-            document.getElementById('status').innerText = "تم إرسال نبضة للسيرفر! ✅";
-            if (navigator.vibrate) navigator.vibrate(70);
-            setTimeout(() => { document.getElementById('status').innerText = "جاهز للإرسال بالسحابة ☁️"; }, 1000);
+    <script src="app.js"></script>
+</body>
+</html>
         }
 
         // تحديث العداد فورياً من قاعدة البيانات
