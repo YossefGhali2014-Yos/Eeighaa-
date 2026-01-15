@@ -20,35 +20,36 @@ const pulseBtn = document.getElementById('pulseBtn') as HTMLDivElement;
 const countDisplay = document.getElementById('globalCount') as HTMLSpanElement;
 const statusText = document.getElementById('status') as HTMLParagraphElement;
 
-// متغيرات لقياس السرعة (الشعور)
-let lastClickTime = 0;
 let energy = 0;
+let lastClick = 0;
 
 function sendPulse(): void {
     const now = Date.now();
-    const diff = now - lastClickTime;
-    lastClickTime = now;
+    const gap = now - lastClick;
+    lastClick = now;
 
-    // إذا كان الفرق أقل من 300 مللي ثانية، الشخص متحمس!
-    if (diff < 300) {
-        energy = Math.min(energy + 20, 100); // زيادة الطاقة
+    // معادلة الطاقة: كلما قل الفارق عن 100ms (سرعة الـ Auto Clicker) زاد التوهج
+    if (gap < 150) {
+        energy = Math.min(energy + 15, 200); 
     } else {
-        energy = Math.max(energy - 10, 0); // هدوء
+        energy = Math.max(energy - 5, 0);
     }
 
-    // تحديث شكل الدائرة بناءً على "الطاقة"
     if (pulseBtn) {
-        pulseBtn.style.boxShadow = `0 0 ${20 + energy}px #9d50bb`;
-        pulseBtn.style.filter = `brightness(${1 + energy/100})`;
+        // تغيير اللون بناءً على الطاقة (من البنفسجي للأحمر المتوهج)
+        const glowColor = energy > 100 ? '#ff0080' : '#9d50bb';
+        pulseBtn.style.boxShadow = `0 0 ${20 + energy}px ${glowColor}`;
+        pulseBtn.style.transform = `scale(${1 + (energy / 500)})`; // الدائرة تكبر مع الحماس
+        pulseBtn.style.background = `radial-gradient(circle, ${glowColor}, #6e48aa)`;
     }
 
     db.ref('global_pulses').transaction((c: number | null) => (c || 0) + 1);
     
     if (statusText) {
-        statusText.innerText = energy > 50 ? "إيقاع حماسي! 🔥" : "إيقاع هادئ.. ✨";
+        if (energy > 150) statusText.innerText = "وضع الـ Supernova! 💥";
+        else if (energy > 50) statusText.innerText = "حماس مفرط! 🔥";
+        else statusText.innerText = "نبض مستقر.. ✨";
     }
-
-    if (navigator.vibrate) navigator.vibrate(energy > 50 ? 100 : 50);
 }
 
 if (pulseBtn) { pulseBtn.addEventListener('click', sendPulse); }
