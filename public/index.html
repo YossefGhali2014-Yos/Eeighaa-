@@ -1,39 +1,88 @@
 <!DOCTYPE html>
-<html dir="rtl" lang="ar">
+<html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>إيقاع - شارك نبضك</title>
+    <title>إيقاع - بث مباشر للنبض</title>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
     <style>
         body { 
-            background-color: #0d1117; 
-            color: white; 
-            display: flex; 
-            flex-direction: column; 
-            justify-content: center; 
-            align-items: center; 
-            height: 100vh; 
-            margin: 0; 
-            font-family: sans-serif; 
-            overflow: hidden; 
+            background: #0d1117; color: white; text-align: center; 
+            font-family: sans-serif; height: 100vh; display: flex; 
+            flex-direction: column; justify-content: center; 
+            align-items: center; margin: 0; overflow: hidden;
         }
-        /* الدائرة البنفسجية المركزية */
-        .purple-circle { 
-            width: 120px;
-            height: 120px;
-            background-color: #8a2be2; /* لون بنفسجي جذاب */
-            border-radius: 50%;
-            cursor: pointer;
-            box-shadow: 0 0 20px rgba(138, 43, 226, 0.5);
-            transition: transform 0.1s;
+        /* الدائرة البنفسجية كما طلبت */
+        .circle { 
+            width: 220px; height: 220px; 
+            background: radial-gradient(circle, #9d50bb, #6e48aa); 
+            border-radius: 50%; cursor: pointer; 
+            box-shadow: 0 0 30px #9d50bb; transition: 0.1s; 
             animation: breathe 2s infinite ease-in-out;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            position: relative;
-            z-index: 10;
+            position: relative; z-index: 10;
         }
-        .purple-circle:active { transform: scale(0.9); }
+        .circle:active { transform: scale(0.9); animation: none; }
+        
+        @keyframes breathe {
+            0%, 100% { transform: scale(1); box-shadow: 0 0 20px rgba(157, 80, 187, 0.5); }
+            50% { transform: scale(1.05); box-shadow: 0 0 40px rgba(157, 80, 187, 0.8); }
+        }
+
+        #status { margin-top: 20px; color: #00d2ff; font-weight: bold; min-height: 24px; }
+        .count-box { margin-top: 10px; font-size: 1.2rem; opacity: 0.8; }
+        #globalCount { font-size: 2rem; color: #9d50bb; display: block; }
+    </style>
+</head>
+<body>
+    <h1>تطبيق إيقاع</h1>
+    
+    <div class="circle" onclick="sendPulse()"></div>
+    
+    <p id="status">جاهز للإرسال بالسحابة ☁️</p>
+    
+    <div class="count-box">
+        إجمالي النبضات العالمية:
+        <span id="globalCount">0</span>
+    </div>
+
+    <script>
+        // إعدادات Firebase الخاصة بمشروعك
+        const firebaseConfig = {
+            apiKey: "AIzaSyAR1rdxhN88u7tsc0juOsu...", 
+            authDomain: "eeighaa-ebcd1.firebaseapp.com",
+            databaseURL: "https://eeighaa-ebcd1-default-rtdb.europe-west1.firebasedatabase.app",
+            projectId: "eeighaa-ebcd1",
+            storageBucket: "eeighaa-ebcd1.firebasestorage.app"
+        };
+        
+        // تشغيل Firebase
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+
+        // وظيفة إرسال النبضة الفعلية
+        function sendPulse() {
+            database.ref('global_pulses').transaction((currentCount) => {
+                return (currentCount || 0) + 1;
+            });
+            
+            document.getElementById('status').innerText = "تم إرسال نبضة للسيرفر! ✅";
+            
+            // اهتزاز الهاتف عند النبض
+            if (navigator.vibrate) navigator.vibrate(70);
+
+            setTimeout(() => {
+                document.getElementById('status').innerText = "جاهز للإرسال بالسحابة ☁️";
+            }, 1000);
+        }
+
+        // الاستماع للنبضات العالمية وتحديث الرقم فوراً
+        database.ref('global_pulses').on('value', (snapshot) => {
+            document.getElementById('globalCount').innerText = snapshot.val() || 0;
+        });
+    </script>
+</body>
+</html>
         
         /* أنيميشن التنفس للدائرة */
         @keyframes breathe {
