@@ -1,4 +1,4 @@
-// 1. إعدادات Firebase
+// 1. الإعدادات
 interface FirebaseConfig {
     apiKey: string;
     authDomain: string;
@@ -13,70 +13,35 @@ const config: FirebaseConfig = {
     projectId: "eeighaa-ebcd1"
 };
 
-// 2. تهيئة التطبيق
+// 2. التهيئة
 declare var firebase: any;
 if (!firebase.apps.length) {
     firebase.initializeApp(config);
 }
 const db = firebase.database();
 
-// 3. تعريف العناصر
+// 3. العناصر
 const pulseBtn = document.getElementById('pulseBtn') as HTMLDivElement;
 const countDisplay = document.getElementById('globalCount') as HTMLSpanElement;
 const statusText = document.getElementById('status') as HTMLParagraphElement;
 
-// 4. وظيفة النبض
+// 4. الوظيفة
 function sendPulse(): void {
     db.ref('global_pulses').transaction((current: number | null) => (current || 0) + 1);
     if (statusText) {
         statusText.innerText = "تم إرسال نبضة ذكية! ✅";
-        setTimeout(() => {
-            statusText.innerText = "متصل بالسحابة (TS) ☁️";
-        }, 1000);
+        setTimeout(() => { statusText.innerText = "متصل بالسحابة (TS) ☁️"; }, 1000);
     }
-    if (navigator.vibrate) {
-        navigator.vibrate(70);
-    }
+    if (navigator.vibrate) navigator.vibrate(70);
 }
 
-// 5. ربط الأحداث
+// 5. التنفيذ
 if (pulseBtn) {
     pulseBtn.addEventListener('click', sendPulse);
 }
 
-// 6. الاستماع للبيانات العالمية
 db.ref('global_pulses').on('value', (snapshot: any) => {
     if (countDisplay) {
         countDisplay.innerText = snapshot.val() || 0;
     }
-});
-if (pulseBtn) {
-    pulseBtn.onclick = sendPulse;
-}
-
-db.ref('global_pulses').on('value', (snapshot: any) => {
-    if (countDisplay) {
-        countDisplay.innerText = snapshot.val() || 0;
-    }
-});
-if (pulseBtn) {
-    pulseBtn.onclick = sendPulse;
-}
-
-db.ref('global_pulses').on('value', (snapshot: any) => {
-    if (countDisplay) {
-        countDisplay.innerText = snapshot.val() || 0;
-    }
-});
-    if (countDisplay) countDisplay.innerText = snap.val() || 0;
-    if (statusText) statusText.innerText = "متصل بالسحابة (TS) ☁️";
-});
-    if (globalDisplay) {
-        globalDisplay.innerText = snapshot.val() || 0;
-    }
-});
-// الاستماع للبيانات
-db.ref('global_pulses').on('value', (snapshot: any) => {
-    countDisplay.innerText = snapshot.val() || 0;
-    statusText.innerText = "متصل بالسحابة ☁️";
 });
