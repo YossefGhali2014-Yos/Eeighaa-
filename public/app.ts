@@ -15,38 +15,50 @@ const db = firebase.database();
 
 const pulseBtn = document.getElementById('pulseBtn') as HTMLDivElement;
 const countDisplay = document.getElementById('globalCount') as HTMLSpanElement;
+const statusText = document.getElementById('status') as HTMLDivElement;
 
-let visualEnergy = 0;
+let energy = 0;
 
-// محرك الرسم: يعمل بتردد 60 إطار في الثانية مهما كانت سرعة الضغط
-function renderLoop() {
+// محرك الرسم المستقل - يضمن ظهور التوهج مهما كانت سرعة الـ Auto Clicker
+function animate() {
     if (pulseBtn) {
-        // حساب التوهج: من البنفسجي إلى الأبيض المتوهج عند 1ms
-        const hue = Math.max(280 - visualEnergy, 0); // يتحول للون أفتح
-        const brightness = 100 + Math.min(visualEnergy, 150);
+        // تأثير التوهج والحجم بناءً على "طاقة" الضغطات
+        const glow = 15 + (energy / 1.5);
+        const scale = 1 + (energy / 400);
+        const brightness = 100 + (energy / 2);
         
-        pulseBtn.style.boxShadow = `0 0 ${10 + visualEnergy/2}px hsla(${hue}, 70%, 60%, 0.8)`;
-        pulseBtn.style.transform = `scale(${1 + Math.min(visualEnergy/500, 0.4)})`;
+        // تحول اللون للوردي المحمر عند الانفجار
+        const hue = 280 - (energy / 2); 
+        
+        pulseBtn.style.boxShadow = `0 0 ${glow}px hsla(${hue}, 80%, 60%, 0.9)`;
+        pulseBtn.style.transform = `scale(${scale})`;
         pulseBtn.style.filter = `brightness(${brightness}%)`;
+        
+        // استنزاف الطاقة تدريجياً لخلق تأثير "النبض"
+        if (energy > 0) energy -= 2;
     }
-
-    // تقليل الطاقة تدريجياً لضمان "هبوط" ناعم بعد توقف الـ Auto Clicker
-    visualEnergy = Math.max(visualEnergy - 1.5, 0);
-    requestAnimationFrame(renderLoop);
+    requestAnimationFrame(animate);
 }
 
-renderLoop();
+animate();
 
-function sendPulse(): void {
-    // زيادة الطاقة: مع 1ms، ستصل الطاقة لقمة مستواها في أجزاء من الثانية
-    visualEnergy = Math.min(visualEnergy + 5, 400); 
+function triggerPulse(e: Event) {
+    e.preventDefault();
+    // زيادة الطاقة: مع 1ms ستصل للـ 300 بسرعة وتحدث الانفجار
+    energy = Math.min(energy + 12, 350);
 
-    // تحديث قاعدة البيانات
+    if (statusText) {
+        if (energy > 200) statusText.innerText = "وضع الانفجار! 🔥";
+        else statusText.innerText = "إيقاع نشط ✨";
+    }
+
     db.ref('global_pulses').transaction((c: number | null) => (c || 0) + 1);
 }
 
 if (pulseBtn) {
-    pulseBtn.addEventListener('click', sendPulse);
+    // استخدام أحداث سريعة جداً لدعم الـ Auto Clicker واللمس
+    pulseBtn.addEventListener('mousedown', triggerPulse);
+    pulseBtn.addEventListener('touchstart', triggerPulse);
 }
 
 db.ref('global_pulses').on('value', (snap: any) => {
