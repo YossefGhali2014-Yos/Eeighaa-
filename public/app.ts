@@ -59,28 +59,3 @@ if (pulseBtn) {
 db.ref('global_pulses').on('value', (snap: any) => {
     if (countDisplay) countDisplay.innerText = snap.val() || 0;
 });
-}
-
-render();
-
-// 3. معالج الضغطات (يدعم 1ms واللمس)
-function triggerPulse(e: Event) {
-    e.preventDefault();
-    energy = Math.min(energy + 12, 350); // شحن الطاقة فوراً
-
-    if (statusText) {
-        statusText.innerText = energy > 200 ? "وضع الانفجار! 🔥" : "تم إرسال نبضة! ✅";
-    }
-
-    db.ref('global_pulses').transaction((c: number | null) => (c || 0) + 1);
-}
-
-if (pulseBtn) {
-    pulseBtn.addEventListener('mousedown', triggerPulse);
-    pulseBtn.addEventListener('touchstart', triggerPulse);
-}
-
-// 4. تحديث العداد العالمي
-db.ref('global_pulses').on('value', (snap: any) => {
-    if (countDisplay) countDisplay.innerText = snap.val() || 0;
-});
