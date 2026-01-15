@@ -1,8 +1,5 @@
 interface FirebaseConfig {
-    apiKey: string;
-    authDomain: string;
-    databaseURL: string;
-    projectId: string;
+    apiKey: string; authDomain: string; databaseURL: string; projectId: string;
 }
 
 const config: FirebaseConfig = {
@@ -21,35 +18,37 @@ const countDisplay = document.getElementById('globalCount') as HTMLSpanElement;
 const statusText = document.getElementById('status') as HTMLParagraphElement;
 
 let energy = 0;
-let lastClick = 0;
+
+function updateVisuals() {
+    if (pulseBtn) {
+        // إذا كانت الطاقة عالية، نتحول للون الأحمر المتوهج فوراً
+        const intensity = Math.min(energy, 255);
+        const color = energy > 100 ? `rgb(255, ${255 - intensity}, ${intensity})` : '#9d50bb';
+        
+        pulseBtn.style.boxShadow = `0 0 ${20 + energy}px ${color}`;
+        pulseBtn.style.transform = `scale(${1 + (energy / 400)})`;
+        pulseBtn.style.filter = `brightness(${1 + energy/100})`;
+    }
+    
+    // تقليل الطاقة تدريجياً لخلق تأثير النبض
+    energy = Math.max(energy - 2, 0);
+    requestAnimationFrame(updateVisuals);
+}
+
+// بدء حلقة التحديث البصري
+updateVisuals();
 
 function sendPulse(): void {
-    const now = Date.now();
-    const gap = now - lastClick;
-    lastClick = now;
-
-    // معادلة الطاقة: كلما قل الفارق عن 100ms (سرعة الـ Auto Clicker) زاد التوهج
-    if (gap < 150) {
-        energy = Math.min(energy + 15, 200); 
-    } else {
-        energy = Math.max(energy - 5, 0);
-    }
-
-    if (pulseBtn) {
-        // تغيير اللون بناءً على الطاقة (من البنفسجي للأحمر المتوهج)
-        const glowColor = energy > 100 ? '#ff0080' : '#9d50bb';
-        pulseBtn.style.boxShadow = `0 0 ${20 + energy}px ${glowColor}`;
-        pulseBtn.style.transform = `scale(${1 + (energy / 500)})`; // الدائرة تكبر مع الحماس
-        pulseBtn.style.background = `radial-gradient(circle, ${glowColor}, #6e48aa)`;
-    }
+    // مع كل ضغطة، نقفز بالطاقة فوراً
+    energy = Math.min(energy + 30, 300); 
 
     db.ref('global_pulses').transaction((c: number | null) => (c || 0) + 1);
     
     if (statusText) {
-        if (energy > 150) statusText.innerText = "وضع الـ Supernova! 💥";
-        else if (energy > 50) statusText.innerText = "حماس مفرط! 🔥";
-        else statusText.innerText = "نبض مستقر.. ✨";
+        statusText.innerText = energy > 150 ? "انفجار شعوري! 💥" : "نبض حي.. ✨";
     }
+    
+    if (navigator.vibrate) navigator.vibrate(energy > 100 ? 50 : 20);
 }
 
 if (pulseBtn) { pulseBtn.addEventListener('click', sendPulse); }
