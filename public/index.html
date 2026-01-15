@@ -3,55 +3,36 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>إيقاع - النبض العالمي</title>
+    <title>إيقاع - بث مباشر</title>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
     <style>
         body { background: #0d1117; color: white; text-align: center; font-family: sans-serif; height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; margin: 0; overflow: hidden; }
-        .circle { width: 180px; height: 180px; background: radial-gradient(circle, #9d50bb, #6e48aa); border-radius: 50%; cursor: pointer; box-shadow: 0 0 30px #9d50bb; transition: 0.1s; animation: breathe 2s infinite ease-in-out; }
+        
+        /* الدائرة البنفسجية المطلوبة */
+        .circle { 
+            width: 200px; height: 200px; 
+            background: radial-gradient(circle, #9d50bb, #6e48aa); 
+            border-radius: 50%; cursor: pointer; 
+            box-shadow: 0 0 30px #9d50bb; transition: 0.1s; 
+            animation: breathe 2s infinite ease-in-out; 
+        }
         .circle:active { transform: scale(0.9); }
-        @keyframes breathe { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.08); } }
-        #status { margin-top: 20px; color: #00d2ff; }
-        .count-box { margin-top: 15px; font-size: 1.5rem; }
+        
+        @keyframes breathe { 
+            0%, 100% { transform: scale(1); opacity: 0.9; } 
+            50% { transform: scale(1.05); opacity: 1; } 
+        }
+
+        #status { margin-top: 20px; color: #00d2ff; font-weight: bold; }
+        .count-box { margin-top: 15px; font-size: 1.2rem; }
+        #globalCount { font-size: 2.5rem; color: #9d50bb; display: block; margin-top: 5px; }
     </style>
 </head>
 <body>
     <h1>تطبيق إيقاع</h1>
     <div class="circle" onclick="sendPulse()"></div>
     <p id="status">جاهز للإرسال بالسحابة ☁️</p>
-    <div class="count-box">إجمالي النبضات العالمية: <span id="globalCount">0</span></div>
-
-    <script>
-        const firebaseConfig = {
-            apiKey: "AIzaSyAR1rdxhN88u7tsc0juOsu...", 
-            authDomain: "eeighaa-ebcd1.firebaseapp.com",
-            databaseURL: "https://eeighaa-ebcd1-default-rtdb.europe-west1.firebasedatabase.app",
-            projectId: "eeighaa-ebcd1",
-            storageBucket: "eeighaa-ebcd1.firebasestorage.app"
-        };
-        firebase.initializeApp(firebaseConfig);
-        const database = firebase.database();
-
-        function sendPulse() {
-            database.ref('global_pulses').transaction(c => (c || 0) + 1);
-            document.getElementById('status').innerText = "تم إرسال نبضة للسيرفر! ✅";
-            if (navigator.vibrate) navigator.vibrate(70);
-            setTimeout(() => { document.getElementById('status').innerText = "جاهز للإرسال بالسحابة ☁️"; }, 1000);
-        }
-
-        database.ref('global_pulses').on('value', (s) => {
-            document.getElementById('globalCount').innerText = s.val() || 0;
-        });
-    </script>
-</body>
-</html>
-<body>
-    <h1>تطبيق إيقاع</h1>
-    
-    <div class="circle" onclick="sendPulse()"></div>
-    
-    <p id="status">جاهز للإرسال بالسحابة ☁️</p>
-    
     <div class="count-box">
         إجمالي النبضات العالمية:
         <span id="globalCount">0</span>
@@ -67,91 +48,22 @@
             storageBucket: "eeighaa-ebcd1.firebasestorage.app"
         };
         
-        // تشغيل Firebase
         firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
 
-        // وظيفة إرسال النبضة الفعلية
+        // إرسال النبضة للسيرفر
         function sendPulse() {
             database.ref('global_pulses').transaction((currentCount) => {
                 return (currentCount || 0) + 1;
             });
-            
             document.getElementById('status').innerText = "تم إرسال نبضة للسيرفر! ✅";
-            
-            // اهتزاز الهاتف عند النبض
             if (navigator.vibrate) navigator.vibrate(70);
-
-            setTimeout(() => {
-                document.getElementById('status').innerText = "جاهز للإرسال بالسحابة ☁️";
-            }, 1000);
+            setTimeout(() => { document.getElementById('status').innerText = "جاهز للإرسال بالسحابة ☁️"; }, 1000);
         }
 
-        // الاستماع للنبضات العالمية وتحديث الرقم فوراً
+        // تحديث العداد فورياً من قاعدة البيانات
         database.ref('global_pulses').on('value', (snapshot) => {
             document.getElementById('globalCount').innerText = snapshot.val() || 0;
-        });
-    </script>
-</body>
-</html>
-        
-        /* أنيميشن التنفس للدائرة */
-        @keyframes breathe {
-            0%, 100% { transform: scale(1); box-shadow: 0 0 20px rgba(138, 43, 226, 0.5); }
-            50% { transform: scale(1.05); box-shadow: 0 0 40px rgba(138, 43, 226, 0.8); }
-        }
-
-        /* تأثير موجة النبض عند الضغط */
-        .wave {
-            position: absolute;
-            border: 2px solid #8a2be2;
-            border-radius: 50%;
-            pointer-events: none;
-            animation: wave-out 0.8s ease-out forwards;
-        }
-        @keyframes wave-out {
-            from { width: 120px; height: 120px; opacity: 1; }
-            to { width: 500px; height: 500px; opacity: 0; }
-        }
-
-        h1 { margin-top: 30px; font-weight: 300; letter-spacing: 1px; }
-    </style>
-</head>
-<body>
-
-    <div class="purple-circle" id="pulse-btn"></div>
-    <h1 id="status">المس الدائرة لتشارك نبضك</h1>
-
-    <script>
-        const btn = document.getElementById('pulse-btn');
-        const status = document.getElementById('status');
-
-        btn.addEventListener('click', (e) => {
-            // إنشاء موجة بنفسجية
-            const wave = document.createElement('div');
-            wave.classList.add('wave');
-            // ضبط مكان الموجة في المنتصف تماماً
-            wave.style.left = '50%';
-            wave.style.top = '50%';
-            wave.style.transform = 'translate(-50%, -50%)';
-            document.body.appendChild(wave);
-            
-            status.innerText = "نبضتك تسافر الآن..";
-            
-            // اهتزاز وتأثير بسيط
-            if (navigator.vibrate) navigator.vibrate(60);
-
-            setTimeout(() => {
-                status.innerText = "المس الدائرة لتشارك نبضك";
-                wave.remove();
-            }, 800);
-        });
-    </script>
-</body>
-</html>
-
-            // اهتزاز بسيط للهاتف (إذا كان يدعم ذلك)
-            if (navigator.vibrate) navigator.vibrate(50);
         });
     </script>
 </body>
