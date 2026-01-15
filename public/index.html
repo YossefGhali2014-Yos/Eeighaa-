@@ -6,26 +6,24 @@
     <title>إيقاع - الإصدار الشعوري</title>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
-    <style>
-        body { 
-            background: #0d1117; color: white; text-align: center; 
-            font-family: sans-serif; height: 100vh; margin: 0;
-            display: flex; flex-direction: column; 
-            justify-content: center; align-items: center;
-            overflow: hidden; touch-action: none;
-        }
-        .circle { 
-            width: 180px; height: 180px; 
-            background: radial-gradient(circle, #9d50bb, #6e48aa); 
-            border-radius: 50%; cursor: pointer;
-            user-select: none;
-            box-shadow: 0 0 20px rgba(157, 80, 187, 0.5);
-            /* حذفنا الانتقالات والأنيميشن هنا ليعمل الـ TS بسلاسة */
-        }
-        .count-box { margin-top: 25px; }
-        #globalCount { font-size: 3rem; color: #9d50bb; display: block; font-weight: bold; transition: color 0.3s; }
-        #status { height: 20px; margin-bottom: 10px; color: #6e48aa; font-size: 0.9rem; }
-    </style>
+<style>
+    body { 
+        background: #0d1117; color: white; text-align: center; 
+        font-family: sans-serif; height: 100vh; margin: 0;
+        display: flex; flex-direction: column; 
+        justify-content: center; align-items: center;
+        overflow: hidden; touch-action: none;
+    }
+    .circle { 
+        width: 180px; height: 180px; 
+        background: radial-gradient(circle, #9d50bb, #6e48aa); 
+        border-radius: 50%; cursor: pointer;
+        user-select: none;
+        /* ملاحظة: حذفنا الـ transition والـ animation القديم هنا */
+    }
+    #globalCount { font-size: 3rem; color: #9d50bb; font-weight: bold; }
+    #status { height: 30px; margin-bottom: 10px; color: #6e48aa; }
+</style>
 </head>
 <body>
     <div id="status">جاهز للنبض..</div>
