@@ -21,20 +21,26 @@ let energy = 0;
 
 function animate() {
     if (pulseBtn) {
-        // حساب التأثيرات البصرية بناءً على طاقة الضغطات (خصوصاً للـ 1ms)
+        // 1. حساب التأثيرات الأساسية (موجودة لديك)
         const scale = 1 + (energy / 350);
         const glow = 20 + (energy / 1.2);
-        const brightness = 100 + (energy / 3);
+        const hue = 280 - (energy / 2);
         
-        pulseBtn.style.transform = `scale(${scale})`;
-        pulseBtn.style.boxShadow = `0 0 ${glow}px hsla(280, 85%, 65%, 0.9)`;
-        pulseBtn.style.filter = `brightness(${brightness}%)`;
+        // 2. إحساس "الزلزال": اهتزاز الشاشة عند الحماس العالي (جديد)
+        const shake = energy > 200 ? (Math.random() * 10 - 5) : 0;
         
-        // تقليل الطاقة تدريجياً
+        // 3. تطبيق التأثيرات مع الاهتزاز
+        pulseBtn.style.transform = `scale(${scale}) translate(${shake}px, ${shake}px)`;
+        pulseBtn.style.boxShadow = `0 0 ${glow}px hsla(${hue}, 85%, 65%, 0.9)`;
+        
+        // 4. إحساس "تغير الزمان": الخلفية تتحول للأرجواني مع السرعة (جديد)
+        document.body.style.backgroundColor = `rgb(${energy/4}, 17, ${23 + energy/8})`;
+
         if (energy > 0) energy -= 2.8;
     }
     requestAnimationFrame(animate);
 }
+
 
 animate();
 
