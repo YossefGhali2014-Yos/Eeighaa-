@@ -60,12 +60,13 @@ animate();
 function handleAction(e: Event) {
     e.preventDefault();
     energy = Math.min(energy + 18, 500); 
-    db.ref('global_pulses').transaction((c: number | null) => (c || 0) + 1);
-}
 
-if (pulseBtn) {
-    pulseBtn.addEventListener('mousedown', handleAction);
-    pulseBtn.addEventListener('touchstart', handleAction);
+    // إضافة اهتزاز للهاتف عند الطاقة العالية (واقعية أكثر)
+    if (energy > 200 && navigator.vibrate) {
+        navigator.vibrate(50); // يهتز لمدة 50 مللي ثانية
+    }
+
+    db.ref('global_pulses').transaction((c: number | null) => (c || 0) + 1);
 }
 
 db.ref('global_pulses').on('value', (snap: any) => {
