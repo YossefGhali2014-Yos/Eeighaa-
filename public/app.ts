@@ -13,13 +13,33 @@ declare var firebase: any;
 if (!firebase.apps.length) { firebase.initializeApp(config); }
 const db = firebase.database();
 
+// عناصر الواجهة
 const pulseBtn = document.getElementById('pulseBtn') as HTMLDivElement;
 const countDisplay = document.getElementById('globalCount') as HTMLSpanElement;
 const statusText = document.getElementById('status') as HTMLDivElement;
+const nameOverlay = document.getElementById('nameOverlay') as HTMLDivElement;
+const userNameInput = document.getElementById('userNameInput') as HTMLInputElement;
+const startBtn = document.getElementById('startBtn') as HTMLButtonElement;
 
+// المتغيرات الأساسية
 let energy = 0;
-let lastMood = "جاهز لاستقبال شعورك..";
-let highScore = Number(localStorage.getItem('highScore')) || 0; // استرجاع الرقم القياسي
+let lastMood = "جاهز..";
+let highScore = Number(localStorage.getItem('highScore')) || 0;
+let currentUserName = localStorage.getItem('userName') || "";
+
+// نظام التحقق من الاسم
+if (currentUserName) {
+    nameOverlay.style.display = "none";
+}
+
+startBtn.onclick = () => {
+    const val = userNameInput.value.trim();
+    if (val) {
+        currentUserName = val;
+        localStorage.setItem('userName', currentUserName);
+        nameOverlay.style.display = "none";
+    }
+};
 
 function animate() {
     if (pulseBtn) {
@@ -29,24 +49,25 @@ function animate() {
         
         pulseBtn.style.transform = `scale(${scale}) translate(${shake}px, ${shake}px)`;
         
-        // التحقق من كسر الرقم القياسي
+        // تحديث الرقم القياسي في اللحظة
         if (energy > highScore) {
             highScore = Math.floor(energy);
             localStorage.setItem('highScore', highScore.toString());
         }
 
+        // تحديد الحالة بناءً على الطاقة والاسم
         if (energy > 250) {
             pulseBtn.style.boxShadow = `0 0 ${glow}px #ff0000`;
             document.body.style.backgroundColor = "#2a0000"; 
-            lastMood = `تحطيم أرقام! 🔥 (${highScore})`;
+            lastMood = `يا ${currentUserName}.. انفجار! 🔥 (${highScore})`;
         } else if (energy > 100) {
             pulseBtn.style.boxShadow = `0 0 ${glow}px #ff00ff`;
             document.body.style.backgroundColor = "#1a0b2e";
-            lastMood = `حماس مستمر ✨ (الرقم: ${highScore})`;
+            lastMood = `حماس يا ${currentUserName} ✨ (الرقم: ${highScore})`;
         } else {
             pulseBtn.style.boxShadow = `0 0 ${glow}px #9d50bb`;
             document.body.style.backgroundColor = "#0d1117";
-            lastMood = highScore > 0 ? `هدوء.. قياسك: ${highScore}` : "ابدأ لصنع رقمك القياسي!";
+            lastMood = currentUserName ? `أهلاً ${currentUserName}.. قياسك: ${highScore}` : "ابدأ النبض!";
         }
 
         if (statusText) statusText.innerText = lastMood;
@@ -60,13 +81,18 @@ animate();
 function handleAction(e: Event) {
     e.preventDefault();
     energy = Math.min(energy + 18, 500); 
-
-    // إضافة اهتزاز للهاتف عند الطاقة العالية (واقعية أكثر)
-    if (energy > 200 && navigator.vibrate) {
-        navigator.vibrate(50); // يهتز لمدة 50 مللي ثانية
+    
+    // اهتزاز حقيقي للهاتف عند القوة العالية
+    if (energy > 220 && navigator.vibrate) {
+        navigator.vibrate(40);
     }
-
+    
     db.ref('global_pulses').transaction((c: number | null) => (c || 0) + 1);
+}
+
+if (pulseBtn) {
+    pulseBtn.addEventListener('mousedown', handleAction);
+    pulseBtn.addEventListener('touchstart', handleAction);
 }
 
 db.ref('global_pulses').on('value', (snap: any) => {
