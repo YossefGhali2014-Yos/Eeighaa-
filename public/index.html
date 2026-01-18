@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>إيقاع - النبض الكامل</title>
+    <title>إيقاع - النسخة الواقعية</title>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
     <style>
@@ -13,25 +13,54 @@
             display: flex; flex-direction: column; 
             justify-content: center; align-items: center;
             overflow: hidden; touch-action: none;
+            transition: background-color 0.5s ease; /* تنعيم تغير لون الخلفية */
         }
-        #status { height: 40px; color: #9d50bb; font-size: 1.1rem; margin-bottom: 10px; transition: 0.2s; }
+        #status { 
+            height: 50px; color: #9d50bb; font-size: 1.2rem; 
+            margin-bottom: 10px; font-weight: bold;
+        }
         .circle { 
             width: 180px; height: 180px; 
             background: radial-gradient(circle, #9d50bb, #6e48aa); 
             border-radius: 50%; cursor: pointer;
             user-select: none; outline: none; -webkit-tap-highlight-color: transparent;
+            box-shadow: 0 0 20px rgba(157, 80, 187, 0.3);
         }
-        .count-box { margin-top: 30px; display: flex; flex-direction: column; align-items: center; }
-        .count-label { font-size: 1.2rem; color: #888; margin-bottom: 5px; }
-        #globalCount { font-size: 3.5rem; color: #9d50bb; font-weight: bold; line-height: 1; }
+        .count-box { margin-top: 30px; }
+        .count-label { font-size: 1rem; color: #888; display: block; }
+        #globalCount { font-size: 3.5rem; color: #9d50bb; font-weight: bold; }
+        
+        /* صندوق الاسم - يظهر في البداية فقط */
+        #nameOverlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(13, 17, 23, 0.95); display: flex; 
+            flex-direction: column; justify-content: center; align-items: center;
+            z-index: 100;
+        }
+        input { 
+            padding: 12px; border-radius: 8px; border: none; 
+            width: 250px; margin-bottom: 15px; font-size: 1.1rem; text-align: center;
+        }
+        button { 
+            padding: 10px 30px; border-radius: 8px; border: none; 
+            background: #9d50bb; color: white; cursor: pointer; font-size: 1.1rem;
+        }
     </style>
 </head>
 <body>
-    <div id="status">جاري التحميل..</div>
+    <div id="nameOverlay">
+        <h2>مرحباً بك في إيقاع</h2>
+        <input type="text" id="userNameInput" placeholder="أدخل اسمك هنا.." maxlength="15">
+        <button id="startBtn">ابدأ النبض</button>
+    </div>
+
+    <div id="status">جاهز للنبض..</div>
     <div class="circle" id="pulseBtn"></div>
     <div class="count-box">
-        <span class="count-label">إجمالي النبضات:</span>
+        <span class="count-label">إجمالي النبضات العالمية:</span>
         <span id="globalCount">0</span>
     </div>
-    <script src="app.js?v=real_app_v1"></script> </body>
+
+    <script src="app.js?v=realistic_v2"></script>
+</body>
 </html>
